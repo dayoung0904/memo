@@ -3,7 +3,7 @@
 <div class="d-flex justify-content-center">
 	<div class="sign-up-box">
 		<h1 class="mb-4">회원가입</h1>
-		<form id="signUpForm" method="post" action="">
+		<form id="signUpForm" method="post" action="/user/sign-up">
 			<table class="sign-up-table table table-bordered">
 				<tr>
 					<th>* 아이디(4자 이상)<br></th>
@@ -65,7 +65,7 @@ $(document).ready(function(){
 		$.ajax({
 			// request
 			url:"/user/is-duplicated-id"
-			, data:{"loginID":loginId}
+			, data:{"loginId":loginId}
 		
 			// response
 			, success:function(data){
@@ -80,6 +80,69 @@ $(document).ready(function(){
 				alert("중복확인에 실패했습니다.");
 			}
 		});
-	})
+	});
+	
+	// 회원가입 submit
+	$('#signUpForm').on('submit', function(e){
+		e.preventDefault(); // submit 기능 막음, form이 넘어가지 않게
+		
+		//alert("클릭");
+		// validation
+		let loginId = $('#loginId').val().trim();
+		let password = $('#password').val();
+		let confirmPassword = $('#confirmPassword').val();
+		let name = $('#name').val().trim();
+		let email = $('#email').val().trim();
+		
+		if(loginId == ""){
+			alert("아이디를 입력하세요.");
+			return false;
+		}
+		if(!password || !confirmPassword){
+			alert("비밀번호를 입력하세요.");
+			return false;
+		}
+		if(password != confirmPassword){
+			alert("비밀번호가 일치하지 않습니다.");
+			return false;
+		}
+		if(!name){
+			alert("이름을 입력하세요.");
+			return false;
+		}
+		if(!email){
+			alert("이메일을 입력하세요.");
+			return false;
+		}
+		
+		// 중복확인 후 사용 가능한지 확인 => idCheckOk가 d-none이 있을 때 얼럿 띄움
+		if($('#idCheckOk').hasClass('d-none')){
+			alert("아이디 중복확인을 다시 해주세요.");
+			return false;
+		}
+		
+		// 서버로 보내는 방법 두가지
+		// 1) submit을 자바스크립트로 동작 시킴
+		//$(this)[0].submit(); // 화면 이동이 반드시 된다.(jsp, redirect)
+		
+		// 2) AJAX - 응답값이 JSON으로 
+		let url = $(this).attr('action');
+		//alert(url);
+		let params = $(this).serialize(); // form 태그에 있는 name 속성-값으로 파라미터 구성 > 직렬화(key-value화)
+		console.log(params);
+		
+		$.post(url, params) // (어디로, 무엇을) request
+		.done(function(data){ // response
+			// {"code":200, "result":"성공"}
+			if(data.code == 200){ // 성공
+				alert("가입을 환영합니다. 로그인을 해주세요!");
+				location.href = "/user/sign-in-view"; // 로그인 화면으로 이동
+			} else{
+				// 로직 실패
+				alert(data.errorMessage);
+			}
+		});
+		
+	});
 });
 </script>
