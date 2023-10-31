@@ -45,6 +45,25 @@ $(document).ready(function() {
 			alert("비밀번호를 입력하세요");
 			return false;
 		} 
+		
+		// AJAX
+		// form url, params
+		let url = $(this).attr('action');
+		console.log(url);
+		let params = $(this).serialize(); // name 속성이 반드시 있어야 함
+		console.log(params);
+		
+		$.post(url, params) // request
+		.done(function(data){ // response
+			if(data.code == 200){
+				// 성공
+				// 글 목록으로 이동
+				location.href = "/post/post-list-view"
+			} else{
+				// 로직 상 실패
+				alert(data.errorMessage);
+			}
+		});
 	});
 });
 </script>
