@@ -24,6 +24,10 @@ public class PostBO {
 		return postMapper.selectPostListByUserId(userId);
 	}
 	
+	// input: postId, userId		output:Post or null
+	public Post getPostBypostIdUserId(int postId, int userId) {
+		return postMapper.selectPostBypostIdUserId(postId, userId);
+	}
 	// input:파라미터들 		output:X
 	public void addPost(int userId, String userLoginId, String subject, String content, MultipartFile file) {
 		String imagePath = null;
@@ -35,4 +39,5 @@ public class PostBO {
 		
 		postMapper.insertPost(userId, subject, content, imagePath);
 	}
+	
 }

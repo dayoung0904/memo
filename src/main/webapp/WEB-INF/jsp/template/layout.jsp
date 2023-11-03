@@ -20,7 +20,7 @@
 		<header class="bg-warning">
 			<jsp:include page="../include/header.jsp" />
 		</header>
-		<section class="contents">
+		<section class="contents my-3">
 			<jsp:include page="../${viewName}.jsp" />
 		</section>
 		<footer class="bg-warning">
