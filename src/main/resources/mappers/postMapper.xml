@@ -64,4 +64,19 @@
  			, NOW()
  		)
  	</insert>
+ 	
+ 	<update id="updatePostByPostIdUserId" parameterType="map">
+ 		UPDATE `post`
+ 		SET
+ 			`subject` = #{subject}
+ 			, `content` = #{content}
+ 			<!-- imagePath가 있을 때만 수정 -->
+ 			<if test="imagePath != null">
+ 			, `imagePath` = #{imagePath}
+ 			</if>
+ 			, `updatedAt` = NOW()
+ 		WHERE
+ 			`id` = #{postId}
+ 			AND `userId` = #{userId}
+ 	</update>
  </mapper>

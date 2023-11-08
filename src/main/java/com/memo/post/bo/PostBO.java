@@ -2,6 +2,8 @@ package com.memo.post.bo;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +14,7 @@ import com.memo.post.mapper.PostMapper;
 
 @Service
 public class PostBO {
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private PostMapper postMapper;
@@ -28,6 +31,7 @@ public class PostBO {
 	public Post getPostBypostIdUserId(int postId, int userId) {
 		return postMapper.selectPostBypostIdUserId(postId, userId);
 	}
+	
 	// input:파라미터들 		output:X
 	public void addPost(int userId, String userLoginId, String subject, String content, MultipartFile file) {
 		String imagePath = null;
@@ -38,6 +42,38 @@ public class PostBO {
 		}
 		
 		postMapper.insertPost(userId, subject, content, imagePath);
+	}
+	
+	// input:파라미터들		output:X
+	public void updatePost(int userId, String userLoginId, 
+			int postId, String subject, String content, 
+			MultipartFile file) {
+		
+		// 기존 글을 가져와본다. (1. 이미지 교체 시 삭제를 위해서	2. 업데이트 대상이 있는지 확인)
+		Post post = postMapper.selectPostBypostIdUserId(postId, userId);
+		if(post == null) {
+			logger.error("[글 수정] post is null. postId:{}, userId:{}", postId, userId); // 나중을 위한 단서
+			return;
+		}
+		
+		// 파일이 있다면
+		// 1) 새 이미지를 업로드 한다.
+		// 2) 새 이미지 업로드 성공 시 기존 이미지 제거(기존 이미지가 있을 때)
+		String imagePath = null;
+		if(file != null) {
+			// 업로드
+			imagePath = fileManager.saveFile(userLoginId, file);
+			
+			// 업로드 성공 시 기존 이미지 제거(있으면)
+			if(imagePath != null && post.getImagePath() != null) {
+				// 업로드가 성공했고, 기존 이미지가 존재한다면 => 삭제 
+				// 이미지 제거
+				fileManager.deleteFile(post.getImagePath());
+			}
+		}
+		
+		// DB 글 update
+		postMapper.updatePostByPostIdUserId(postId, userId, subject, content, imagePath);
 	}
 	
 }
